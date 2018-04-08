@@ -1,3 +1,4 @@
+from math import *
 from scipy.special import erfinv
 from tkinter import *
 from tkinter import ttk
@@ -18,27 +19,30 @@ Q  = 32900
 
 # get T temperature 900 - 1100
 T = DoubleVar()
+T.set(900)
 
 temp_entry = ttk.Entry(mainframe, width=7, textvariable=T)
 
-D = D0 * math.exp( -Q / (R * T))
+D = D0 * exp( -Q / (R * T.get()))
 
 Cs = 1.3
 
 # get C0 value: select 1018 for .0018, 1045 for .0045
 C0 = DoubleVar()
+C0.set(.0018)
 
 ceeoh_entry = ttk.Combobox(mainframe, width=7, textvariable=C0)
 
-Cx = C0 + math.pow(10, -16)
+Cx = C0.get() + pow(10, -16)
 
-z = (Cs - Cx) / (Cs - C0)
+z = (Cs - Cx) / (Cs - C0.get())
 
 # get t value in minutes
 time = DoubleVar()
+time.set(60)
 
 time_entry = ttk.Entry(mainframe, width=7, textvariable=time)
 
-x = 2 * erfinv(z) * math.pow(D * time, 1/2)
+x = 2 * erfinv(z) * pow(D * time.get(), 1/2)
 
 root.mainloop()
