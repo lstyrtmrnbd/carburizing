@@ -22,6 +22,7 @@ T = DoubleVar()
 T.set(900)
 
 temp_entry = ttk.Entry(mainframe, width=7, textvariable=T)
+temp_entry.grid(column=1, row=2, sticky=(W, E))
 
 D = D0 * exp( -Q / (R * T.get()))
 
@@ -32,6 +33,7 @@ C0 = DoubleVar()
 C0.set(.0018)
 
 ceeoh_entry = ttk.Combobox(mainframe, width=7, textvariable=C0)
+ceeoh_entry.grid(column=1, row=1, sticky=(W, E))
 
 Cx = C0.get() + pow(10, -16)
 
@@ -42,6 +44,7 @@ time = DoubleVar()
 time.set(60)
 
 time_entry = ttk.Entry(mainframe, width=7, textvariable=time)
+time_entry.grid(column=1, row=3, sticky=(W, E))
 
 x = 2 * erfinv(z) * pow(D * time.get(), 1/2)
 
