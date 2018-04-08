@@ -33,10 +33,11 @@ Cs = 0.8
 
 # get C0 value: select 1018 for .0018, 1045 for .0045
 steel = StringVar()
+steel.set('1018')
 C0 = .18
 
 # steel selection callback
-def selectC0(event):
+def selectC0(*args):
     global C0
     if steel.get() == '1018':
         C0 = .18
@@ -48,6 +49,8 @@ steel_entry.grid(column=2, row=1, sticky=(W, E))
 
 steel_entry['values'] = ('1018', '1045')
 steel_entry.bind("<<ComboboxSelected>>", selectC0)
+
+steel.trace("w", selectC0)
 
 steel_label = ttk.Label(mainframe, text="Type of Steel:")
 steel_label.grid(column=1, row=1, sticky=(W, E))
@@ -85,22 +88,23 @@ def update_calc():
 
 output_result = ttk.Label(mainframe)
 output_result.grid(column=2, row=4, sticky=(W, E))
-'''
-#update output callback
-def update_text(event):
-    output_result.configure(text=x)
-    root.update_idletasks()
 
-temp_entry.bind("<Key>", update_text)
-steel_entry.bind("<Key>", update_text)
-time_entry.bind("<Key>", update_text)
-'''
+#update output callback
+#def update_text(event):
+#    output_result.configure(text=x)
+#    root.update_idletasks()
+
+#temp_entry.bind("<Key>", update_text)
+#steel_entry.bind("<Key>", update_text)
+#time_entry.bind("<Key>", update_text)
+
 variable_inspect = ttk.Label(mainframe)
 variable_inspect.grid(column=1, row=5, sticky=(W, E))
 
 #debug callback
 def update_variable_string():
-    var_string = "D: " + str(D) + " Cx: " + str(Cx) + " z: " + str(z) + " x: " + str(x)
+    #var_string = "D: " + str(D) + " Cx: " + str(Cx) + " z: " + str(z) + " x: " + str(x)
+    var_string = "C0: " + str(C0)
     variable_inspect.configure(text=var_string)
     root.update_idletasks()
 
@@ -108,7 +112,7 @@ def update_variable_string():
 def update():
     update_calc()
     output_result.configure(text=x)
-    #update_variable_string()
+    update_variable_string()
 
 calculate = ttk.Button(mainframe, text="Calculate", command=update)
 calculate.grid(column=1, row=6, sticky=(W, E))
