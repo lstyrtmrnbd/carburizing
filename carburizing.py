@@ -28,7 +28,7 @@ Cs = 1.3
 # get C0 value: select 1018 for .0018, 1045 for .0045
 C0 = DoubleVar()
 
-ceeoh_entry = ttk.Entry(mainframe, width=7, textvariable=C0)
+ceeoh_entry = ttk.Combobox(mainframe, width=7, textvariable=C0)
 
 Cx = C0 + math.pow(10, -16)
 
@@ -37,7 +37,8 @@ z = (Cs - Cx) / (Cs - C0)
 # get t value in minutes
 time = DoubleVar()
 
-x = 2 * erfinv(z) * math.pow(D * time, 1/2)
+time_entry = ttk.Entry(mainframe, width=7, textvariable=time)
 
+x = 2 * erfinv(z) * math.pow(D * time, 1/2)
 
 root.mainloop()
