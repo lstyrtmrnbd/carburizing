@@ -54,7 +54,7 @@ time = DoubleVar()
 time.set(60)
 
 time_entry = ttk.Entry(mainframe, width=7, textvariable=time)
-time_entry.grid(column=1, row=3, sticky=(W, E))
+time_entry.grid(column=2, row=3, sticky=(W, E))
 
 x = 2 * erfinv(z) * pow(D * time.get(), 1/2)
 
