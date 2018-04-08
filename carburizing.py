@@ -24,6 +24,9 @@ T.set(900)
 temp_entry = ttk.Entry(mainframe, width=7, textvariable=T)
 temp_entry.grid(column=2, row=2, sticky=(W, E))
 
+temp_label = ttk.Label(mainframe, text="Temperature (C)")
+temp_label.grid(column=1, row=2, sticky=(W, E))
+
 D = D0 * exp( -Q / (R * T.get()))
 
 Cs = 1.3
@@ -45,6 +48,9 @@ steel_entry.grid(column=2, row=1, sticky=(W, E))
 steel_entry['values'] = ('1018', '1045')
 steel_entry.bind('<<ComboboxSelected>>', selectC0)
 
+steel_label = ttk.Label(mainframe, text="Type of Steel:")
+steel_label.grid(column=1, row=1, sticky=(W, E))
+
 Cx = C0 + pow(10, -16)
 
 z = (Cs - Cx) / (Cs - C0)
@@ -56,8 +62,23 @@ time.set(60)
 time_entry = ttk.Entry(mainframe, width=7, textvariable=time)
 time_entry.grid(column=2, row=3, sticky=(W, E))
 
+time_label = ttk.Label(mainframe, text="Time (min.)")
+time_label.grid(column=1, row=3, sticky=(W, E))
+
+output_label = ttk.Label(mainframe, text="Output:")
+output_label.grid(column=1, row=4, sticky=(W, E))
+
 x = 2 * erfinv(z) * pow(D * time.get(), 1/2)
 
+output_result = ttk.Label(mainframe)
+output_result.grid(column=2, row=4, sticky=(W, E))
+
+def updatetext(event):
+    output_result.configure(text=x)
+    root.update_idletasks()
+
+temp_entry.bind("<Key>", updatetext)
+steel_entry.bind("<Key>", updatetext)
+time_entry.bind("<Key>", updatetext)
+
 root.mainloop()
-
-
