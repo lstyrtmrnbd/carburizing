@@ -36,10 +36,11 @@ steel = StringVar()
 C0 = .18
 
 # steel selection callback
-def selectC0():
-    if steel == '1018':
+def selectC0(event):
+    global C0
+    if steel.get() == '1018':
         C0 = .18
-    elif steel == '1045':
+    elif steel.get() == '1045':
         C0 = .45
 
 steel_entry = ttk.Combobox(mainframe, width=7, textvariable=steel)
@@ -54,7 +55,6 @@ steel_label.grid(column=1, row=1, sticky=(W, E))
 Cx = C0 + pow(10, -16)
 
 z = (Cs - Cx) / (Cs - C0)
-#z = (Cx - C0) / (Cs - C0)
 
 # get t value in minutes
 time = DoubleVar()
@@ -69,8 +69,7 @@ time_label.grid(column=1, row=3, sticky=(W, E))
 output_label = ttk.Label(mainframe, text="Output:")
 output_label.grid(column=1, row=4, sticky=(W, E))
 
-x = 2 * erfinv(z) * pow(D * time.get(), 1/2)
-#x = 2 * erfinv(1 - z) * pow(D * time.get(), 1/2)
+x = 2 * erfinv(z) * sqrt(D * time.get())
 
 #recalculate callback
 def update_calc():
@@ -81,12 +80,12 @@ def update_calc():
     D = D0 * exp( -Q / (R * T.get()))
     Cx = C0 + pow(10, -16)
     z = (Cs - Cx) / (Cs - C0)
-    x = 2 * erfinv(z) * pow(D * time.get(), 1/2)
+    x = 2 * erfinv(z) * sqrt(D * time.get())
     root.update_idletasks()
 
 output_result = ttk.Label(mainframe)
 output_result.grid(column=2, row=4, sticky=(W, E))
-
+'''
 #update output callback
 def update_text(event):
     output_result.configure(text=x)
@@ -95,7 +94,7 @@ def update_text(event):
 temp_entry.bind("<Key>", update_text)
 steel_entry.bind("<Key>", update_text)
 time_entry.bind("<Key>", update_text)
-
+'''
 variable_inspect = ttk.Label(mainframe)
 variable_inspect.grid(column=1, row=5, sticky=(W, E))
 

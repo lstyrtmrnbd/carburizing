@@ -20,7 +20,7 @@ z = (Cs-Cx) / (Cs-C0)
   
 prompt3 = 'what is the value for t?'
   
-  t = input (prompt3) // time in minutes
+t = input (prompt3) // time in minutes
   
 x = 2 * erfinv(z) * (D*t)^(1/2)
 
