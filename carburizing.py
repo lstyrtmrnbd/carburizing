@@ -13,13 +13,13 @@ mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
 mainframe.columnconfigure(0, weight=1)
 mainframe.rowconfigure(0, weight=1)
 
-D0 = 0.23
-R  = 1.987
-Q  = 32900
+D0 = 0.23 * 60 # cm^2 / min
+R  = 1.987 # cal / mol K
+Q  = 32900 # cal / mol
 
 # get T temperature 900 - 1100
 T = DoubleVar()
-T.set(900)
+T.set(950)
 
 temp_entry = ttk.Entry(mainframe, width=7, textvariable=T)
 temp_entry.grid(column=2, row=2, sticky=(W, E))
@@ -27,7 +27,7 @@ temp_entry.grid(column=2, row=2, sticky=(W, E))
 temp_label = ttk.Label(mainframe, text="Temperature (C)")
 temp_label.grid(column=1, row=2, sticky=(W, E))
 
-D = D0 * exp( -Q / (R * T.get()))
+D = D0 * exp( -Q / (R * (273 + T.get()))
 
 Cs = 0.8
 
