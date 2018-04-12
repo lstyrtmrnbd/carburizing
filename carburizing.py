@@ -27,9 +27,9 @@ temp_entry.grid(column=2, row=2, sticky=(W, E))
 temp_label = ttk.Label(mainframe, text="Temperature (C)")
 temp_label.grid(column=1, row=2, sticky=(W, E))
 
-D = D0 * exp( -Q / (R * (273 + T.get()))
+D = D0 * exp( -Q / (R * (273 + T.get())))
 
-Cs = 0.8
+Cs = 1.3
 
 # get C0 value: select 1018 for .0018, 1045 for .0045
 steel = StringVar()
@@ -80,7 +80,7 @@ def update_calc():
     global Cx
     global z
     global x
-    D = D0 * exp( -Q / (R * T.get()))
+    D = D0 * exp( -Q / (R * (273 + T.get())))
     Cx = C0 + pow(10, -16)
     z = (Cs - Cx) / (Cs - C0)
     x = 2 * erfinv(z) * sqrt(D * time.get())
