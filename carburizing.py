@@ -46,7 +46,6 @@ def main():
     root = Tk()
     mainframe = ttk.Frame(root, padding="3 3 12 12")
 
-    # tie these to calc variables
     tempt = DoubleVar()
     steel = StringVar()
     time = DoubleVar()
@@ -63,7 +62,6 @@ def main():
 
     output_entry = ttk.Entry(mainframe, width=7, textvariable=depth)
     output_label = ttk.Label(mainframe, text="Depth (cm):")
-    output_result = ttk.Label(mainframe)
 
     calculate = ttk.Button(mainframe, text="Calculate")
     variable_inspect = ttk.Label(mainframe)
@@ -93,8 +91,6 @@ def main():
         output_entry.grid(column=2, row=4, sticky=(W, E))
         output_label.grid(column=1, row=4, sticky=(W, E))
 
-        output_result.grid(column=2, row=4, sticky=(W, E))
-
         variable_inspect.grid(column=1, row=5, sticky=(W, E))
         
         calculate.grid(column=1, row=6, sticky=(W, E))
@@ -120,7 +116,7 @@ def main():
         root.update_idletasks()
 
     #debug callback
-    def update_variable_string():
+    def update_debug():
         #var_string = "D: " + str(calc.D) + " Cx: " + str(calc.Cx) + " z: " + str(calc.z) + " x: " + str(calc.x)
         var_string = "C0: " + str(calc.C0)
         variable_inspect.configure(text=var_string)
@@ -130,8 +126,7 @@ def main():
     def update():
         update_variables()
         update_calc()
-        output_result.configure(text=calc.x)
-        update_variable_string()
+        update_debug()
 
     init()
     
