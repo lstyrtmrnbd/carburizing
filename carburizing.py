@@ -9,24 +9,27 @@ from tkinter import ttk
 
 class Calculator:
 
+    D0 = 0.23 * 60 # cm^2 / min
+    R  = 1.987     # cal / mol K
+    Q  = 32900     # cal / mol
+    Cs = 1.3
+
     def __init__(self):
-        self.D0 = 0.23 * 60 # cm^2 / min
-        self.R  = 1.987     # cal / mol K
-        self.Q  = 32900     # cal / mol
-        self.T = 950        # temperature (C)
-        self.Cs = 1.3
-        self.C0 = .18
-        self.time = 60
         
-        self.D = self.D0 * exp( -self.Q / (self.R * (273 + self.T)))  
+        self.T = 950        # temperature (C)
+
+        self.C0 = .18
+        self.time = 60      # min
+        
+        self.D = D0 * exp( -Q / (R * (273 + self.T)))  
         self.Cx = self.C0 + pow(10, -16)
-        self.z = (self.Cs - self.Cx) / (self.Cs - self.C0)
+        self.z = (Cs - self.Cx) / (Cs - self.C0)
         self.x = 2 * erfinv(self.z) * sqrt(self.D * self.time)
 
     def update():
-        self.D = self.D0 * exp( -self.Q / (self.R * (273 + self.T)))  
+        self.D = D0 * exp( -Q / (R * (273 + self.T)))  
         self.Cx = self.C0 + pow(10, -16)
-        self.z = (self.Cs - self.Cx) / (self.Cs - self.C0)
+        self.z = (Cs - self.Cx) / (Cs - self.C0)
         self.x = 2 * erfinv(self.z) * sqrt(self.D * self.time)
 
     def solve_x():
@@ -36,8 +39,7 @@ class Calculator:
         self.time = pow(self.x / (2 * erfinv(self.z))), 2) / self.D
 
     def solve_T():
-        self.T = -self.Q / (self.R * log(self.D / self.D0)) - 273
-
+        self.T = -Q / (R * log(self.D / D0)) - 273
 
 root = Tk()
 
