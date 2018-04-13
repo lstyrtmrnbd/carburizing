@@ -19,13 +19,25 @@ Q  = 32900 # cal / mol
 
 # get T temperature 900 - 1100
 T = DoubleVar()
+Tin = DoubleVar()
 T.set(950)
+Tin.set(950)
 
-temp_entry = ttk.Entry(mainframe, width=7, textvariable=T)
+def capT(*args):
+    global T
+    if Tin.get() > 1000:
+        Tin.set(1000)
+    elif Tin.get() < 900:
+        Tin.set(900)
+    T.set(Tin.get())
+
+temp_entry = Spinbox(mainframe,from_=900, to=1000, textvariable=Tin)
 temp_entry.grid(column=2, row=2, sticky=(W, E))
 
 temp_label = ttk.Label(mainframe, text="Temperature (C)")
 temp_label.grid(column=1, row=2, sticky=(W, E))
+
+Tin.trace("w", capT)
 
 D = D0 * exp( -Q / (R * (273 + T.get())))
 
@@ -50,7 +62,7 @@ steel_entry.grid(column=2, row=1, sticky=(W, E))
 steel_entry['values'] = ('1018', '1045')
 steel_entry.bind("<<ComboboxSelected>>", selectC0)
 
-steel.trace("w", selectC0)
+#steel.trace("w", selectC0)
 
 steel_label = ttk.Label(mainframe, text="Type of Steel:")
 steel_label.grid(column=1, row=1, sticky=(W, E))
@@ -69,7 +81,12 @@ time_entry.grid(column=2, row=3, sticky=(W, E))
 time_label = ttk.Label(mainframe, text="Time (min.)")
 time_label.grid(column=1, row=3, sticky=(W, E))
 
-output_label = ttk.Label(mainframe, text="Output:")
+depth = DoubleVar()
+
+output_entry = ttk.Entry(mainframe, width=7, textvariable=depth)
+output_entry.grid(column=2, row=4, sticky=(W, E))
+
+output_label = ttk.Label(mainframe, text="Depth (cm):")
 output_label.grid(column=1, row=4, sticky=(W, E))
 
 x = 2 * erfinv(z) * sqrt(D * time.get())
@@ -84,19 +101,11 @@ def update_calc():
     Cx = C0 + pow(10, -16)
     z = (Cs - Cx) / (Cs - C0)
     x = 2 * erfinv(z) * sqrt(D * time.get())
+    depth.set(x)
     root.update_idletasks()
 
 output_result = ttk.Label(mainframe)
 output_result.grid(column=2, row=4, sticky=(W, E))
-
-#update output callback
-#def update_text(event):
-#    output_result.configure(text=x)
-#    root.update_idletasks()
-
-#temp_entry.bind("<Key>", update_text)
-#steel_entry.bind("<Key>", update_text)
-#time_entry.bind("<Key>", update_text)
 
 variable_inspect = ttk.Label(mainframe)
 variable_inspect.grid(column=1, row=5, sticky=(W, E))
