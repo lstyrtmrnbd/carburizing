@@ -24,19 +24,19 @@ class Calculator:
         self.z = (Calculator.Cs - self.Cx) / (Calculator.Cs - self.C0)
         self.x = 2 * erfinv(self.z) * sqrt(self.D * self.time)
 
-    def update():
+    def update(self):
         self.D = self.D0 * exp( -Calculator.Q / (Calculator.R * (273 + self.T)))  
         self.Cx = self.C0 + pow(10, -16)
         self.z = (Calculator.Cs - self.Cx) / (Calculator.Cs - self.C0)
         self.x = 2 * erfinv(self.z) * sqrt(self.D * self.time)
 
-    def solve_x():
+    def solve_x(self):
         self.x = 2 * erfinv(self.z) * sqrt(self.D * self.time)
 
-    def solve_time():
+    def solve_time(self):
         self.time = pow(self.x / (2 * erfinv(self.z)), 2) / self.D
 
-    def solve_tempt():
+    def solve_tempt(self):
         self.T = -Calculator.Q / (Calculator.R * log(self.D / self.D0)) - 273
 
 def main():
@@ -46,6 +46,7 @@ def main():
     root = Tk()
     mainframe = ttk.Frame(root, padding="3 3 12 12")
 
+    # tie these to calc variables
     tempt = DoubleVar()
     steel = StringVar()
     time = DoubleVar()
@@ -84,6 +85,8 @@ def main():
         steel_entry.grid(column=2, row=1, sticky=(W, E))
         steel_entry.bind("<<ComboboxSelected>>", selectC0)
 
+        steel_label.grid(column=1, row=1, sticky=(W, E))
+
         time_entry.grid(column=2, row=3, sticky=(W, E))
         time_label.grid(column=1, row=3, sticky=(W, E))
 
@@ -102,9 +105,13 @@ def main():
     # these callbacks are bound to the calculations
     def selectC0(*args):
         if steel.get() == '1018':
-            self.calc.C0 = .18
+            calc.C0 = .18
         elif steel.get() == '1045':
-            self.calc.C0 = .45
+            calc.C0 = .45
+
+    def update_variables():
+        calc.T = tempt.get()
+        calc.time = time.get()
 
     #recalculate callback
     def update_calc():
@@ -121,8 +128,9 @@ def main():
 
     #button update callback    
     def update():
+        update_variables()
         update_calc()
-        output_result.configure(text=x)
+        output_result.configure(text=calc.x)
         update_variable_string()
 
     init()
