@@ -3,6 +3,42 @@ from scipy.special import erfinv
 from tkinter import *
 from tkinter import ttk
 
+#x = 2 * erfinv(z) * sqrt(D * time)
+#time = pow(x/(2* erfinv(z))), 2) / D
+#T = -Q/(R*log(D/D0)) - 273
+
+class Calculator:
+
+    def __init__(self):
+        self.D0 = 0.23 * 60 # cm^2 / min
+        self.R  = 1.987     # cal / mol K
+        self.Q  = 32900     # cal / mol
+        self.T = 950        # temperature (C)
+        self.Cs = 1.3
+        self.C0 = .18
+        self.time = 60
+        
+        self.D = self.D0 * exp( -self.Q / (self.R * (273 + self.T)))  
+        self.Cx = self.C0 + pow(10, -16)
+        self.z = (self.Cs - self.Cx) / (self.Cs - self.C0)
+        self.x = 2 * erfinv(self.z) * sqrt(self.D * self.time)
+
+    def update():
+        self.D = self.D0 * exp( -self.Q / (self.R * (273 + self.T)))  
+        self.Cx = self.C0 + pow(10, -16)
+        self.z = (self.Cs - self.Cx) / (self.Cs - self.C0)
+        self.x = 2 * erfinv(self.z) * sqrt(self.D * self.time)
+
+    def solve_x():
+        self.x = 2 * erfinv(self.z) * sqrt(self.D * self.time)
+
+    def solve_time():
+        self.time = pow(self.x / (2 * erfinv(self.z))), 2) / self.D
+
+    def solve_T():
+        self.T = -self.Q / (self.R * log(self.D / self.D0)) - 273
+
+
 root = Tk()
 
 root.title("Carburization Penetration Depth")
