@@ -1,7 +1,10 @@
+import matplotlib as plt
 from math import *
 from scipy.special import erfinv
 from tkinter import *
 from tkinter import ttk
+import matplotlib.backends.tkagg as tkagg
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 
 #x = 2 * erfinv(z) * sqrt(D * time)
 #time = pow(x/(2* erfinv(z))), 2) / D
@@ -65,7 +68,8 @@ def main():
 
     calculate = ttk.Button(mainframe, text="Calculate")
     variable_inspect = ttk.Label(mainframe)
-    
+
+    canvas = Canvas(mainframe, width=640, height=320)
 
     def init():      
         tempt.set(950)
@@ -95,6 +99,8 @@ def main():
         
         calculate.grid(column=1, row=6, sticky=(W, E))
         calculate.config(command=update)
+
+        canvas.grid(column=3, row=1, columnspan=5, rowspan=5, sticky=N+W)
 
         root.mainloop() # sticks in here and handles events
 
@@ -128,6 +134,76 @@ def main():
         update_calc()
         update_debug()
 
+    def draw_figure(canvas, figure, loc=(0, 0)):
+        """ Draw a matplotlib figure onto a Tk canvas
+
+        loc: location of top-left corner of figure on canvas in pixels.
+        Inspired by matplotlib source: lib/matplotlib/backends/backend_tkagg.py
+        """
+        figure_canvas_agg = FigureCanvasAgg(figure)
+        figure_canvas_agg.draw()
+        figure_x, figure_y, figure_w, figure_h = figure.bbox.bounds
+        figure_w, figure_h = int(figure_w), int(figure_h)
+        photo = tk.PhotoImage(master=canvas, width=figure_w, height=figure_h)
+
+        # Position: convert from top-left anchor to center anchor
+        canvas.create_image(loc[0] + figure_w/2, loc[1] + figure_h/2, image=photo)
+
+        # Unfortunately, there's no accessor for the pointer to the native renderer
+        tkagg.blit(photo, figure_canvas_agg.get_renderer()._renderer, colormode=2)
+
+        # Return a handle which contains a reference to the photo object
+        # which must be kept live or else the picture disappears
+        return photo
+
     init()
     
 main()
+
+"""
+Do=0.23; R=1.987; Q=32900; Cs=1.3;
+x=0:.0005:.01; # 0 to .01 increments of .0005
+prompt='what is the value for T1?';
+T1=input(prompt);
+prompt='what is the value for T2?';
+T2=input(prompt);
+prompt='what is the value for T3?';
+T3=input(prompt);
+prompt='what is the value for t1?';
+t1=input(prompt);
+prompt='what is the value for t2?';
+t2=input(prompt);
+prompt='what is the value for t3?';
+t3=input(prompt);
+prompt='what is the value for t4?';
+t4=input(prompt);
+prompt='what is the value for Co?';
+Co=input(prompt);
+Cx1=Cs-(Cs-Co)*erf(x/(2*(Do*t1*exp(-Q/(R*T1)))));
+Cx2=Cs-(Cs-Co)*erf(x/(2*(Do*t2*exp(-Q/(R*T1)))));
+Cx3=Cs-(Cs-Co)*erf(x/(2*(Do*t3*exp(-Q/(R*T1)))));
+Cx4=Cs-(Cs-Co)*erf(x/(2*(Do*t4*exp(-Q/(R*T1)))));
+Cx5=Cs-(Cs-Co)*erf(x/(2*(Do*t1*exp(-Q/(R*T2)))));
+Cx6=Cs-(Cs-Co)*erf(x/(2*(Do*t2*exp(-Q/(R*T2)))));
+Cx7=Cs-(Cs-Co)*erf(x/(2*(Do*t3*exp(-Q/(R*T2)))));
+Cx8=Cs-(Cs-Co)*erf(x/(2*(Do*t4*exp(-Q/(R*T2)))));
+Cx9=Cs-(Cs-Co)*erf(x/(2*(Do*t1*exp(-Q/(R*T3)))));
+Cx10=Cs-(Cs-Co)*erf(x/(2*(Do*t2*exp(-Q/(R*T3)))));
+Cx11=Cs-(Cs-Co)*erf(x/(2*(Do*t3*exp(-Q/(R*T3)))));
+Cx12=Cs-(Cs-Co)*erf(x/(2*(Do*t4*exp(-Q/(R*T3)))));
+plot(x,Cx1,'g');hold on
+plot(x,Cx2,'b');hold on
+plot(x,Cx3,'r');hold on
+plot(x,Cx4,'c');hold on
+plot(x,Cx5,'--g');hold on
+plot(x,Cx6,'--b');hold on
+plot(x,Cx7,'--r');hold on
+plot(x,Cx8,'--c');hold on
+plot(x,Cx9,':g');hold on
+plot(x,Cx10,':b');hold on
+plot(x,Cx11,':r');hold on
+plot(x,Cx12,':c');hold off
+xlabel('depth (cm)');
+ylabel('concentration @ depth(%C)');
+title('Carburization');
+"""
