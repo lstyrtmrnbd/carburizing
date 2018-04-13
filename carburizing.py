@@ -14,10 +14,8 @@ class Calculator:
     Q  = 32900     # cal / mol
     Cs = 1.3
 
-    def __init__(self):
-        
+    def __init__(self):    
         self.T = 950        # temperature (C)
-
         self.C0 = .18
         self.time = 60      # min
         
@@ -36,11 +34,95 @@ class Calculator:
         self.x = 2 * erfinv(self.z) * sqrt(self.D * self.time)
 
     def solve_time():
-        self.time = pow(self.x / (2 * erfinv(self.z))), 2) / self.D
+        self.time = pow(self.x / (2 * erfinv(self.z)), 2) / self.D
 
     def solve_T():
         self.T = -Q / (R * log(self.D / D0)) - 273
 
+class Main:
+
+    root = Tk()
+    mainframe = ttk.Frame(root, padding="3 3 12 12")
+    tempt = DoubleVar()
+    steel = StringVar()
+    time = DoubleVar()
+    depth = DoubleVar()
+    temp_entry = Spinbox(mainframe,from_=900, to=1000, textvariable=tempt)
+    temp_label = ttk.Label(mainframe, text="Temperature (C)")
+    steel_entry = ttk.Combobox(mainframe, width=7, textvariable=steel)
+    steel_label = ttk.Label(mainframe, text="Type of Steel:")
+    time_entry = ttk.Entry(mainframe, width=7, textvariable=time)
+    time_label = ttk.Label(mainframe, text="Time (min.)")
+    output_entry = ttk.Entry(mainframe, width=7, textvariable=depth)
+    output_label = ttk.Label(mainframe, text="Depth (cm):")
+    output_result = ttk.Label(mainframe)
+    variable_inspect = ttk.Label(mainframe)
+    calculate = ttk.Button(mainframe, text="Calculate", command=update)
+    
+    def __init__(self):
+        tempt.set(950)
+        steel.set('1018')
+        time.set(60)
+
+        mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+        mainframe.columnconfigure(0, weight=1)
+        mainframe.rowconfigure(0, weight=1)
+
+        temp_entry.grid(column=2, row=2, sticky=(W, E))
+        temp_label.grid(column=1, row=2, sticky=(W, E))
+
+        steel_entry['values'] = ('1018', '1045')
+        steel_entry.grid(column=2, row=1, sticky=(W, E))
+        steel_entry.bind("<<ComboboxSelected>>", selectC0)
+
+        time_entry.grid(column=2, row=3, sticky=(W, E))
+        time_label.grid(column=1, row=3, sticky=(W, E))
+
+        output_entry.grid(column=2, row=4, sticky=(W, E))
+        output_label.grid(column=1, row=4, sticky=(W, E))
+
+        output_result.grid(column=2, row=4, sticky=(W, E))
+
+        variable_inspect.grid(column=1, row=5, sticky=(W, E))
+        
+        calculate.grid(column=1, row=6, sticky=(W, E))
+
+        root.mainloop() # sticks in here and handles events
+
+    # these callbacks are bound the calculations
+    def selectC0(*args):
+        global C0
+        if steel.get() == '1018':
+            C0 = .18
+        elif steel.get() == '1045':
+            C0 = .45
+
+    #recalculate callback
+    def update_calc():
+        global D
+        global Cx
+        global z
+        global x
+        D = D0 * exp( -Q / (R * (273 + T.get())))
+        Cx = C0 + pow(10, -16)
+        z = (Cs - Cx) / (Cs - C0)
+        x = 2 * erfinv(z) * sqrt(D * time.get())
+        depth.set(x)
+        root.update_idletasks()
+
+    #debug callback
+    def update_variable_string():
+        #var_string = "D: " + str(D) + " Cx: " + str(Cx) + " z: " + str(z) + " x: " + str(x)
+        var_string = "C0: " + str(C0)
+        variable_inspect.configure(text=var_string)
+        root.update_idletasks()
+
+    #button update callback    
+    def update():
+        update_calc()
+        output_result.configure(text=x)
+        update_variable_string()
+        
 root = Tk()
 
 root.title("Carburization Penetration Depth")
@@ -61,21 +143,21 @@ Tin = DoubleVar()
 T.set(950)
 Tin.set(950)
 
-def capT(*args):
-    global T
-    if Tin.get() > 1000:
-        Tin.set(1000)
-    elif Tin.get() < 900:
-        Tin.set(900)
-    T.set(Tin.get())
+#def capT(*args):
+#    global T
+#    if Tin.get() > 1000:
+#        Tin.set(1000)
+#    elif Tin.get() < 900:
+#        Tin.set(900)
+#    T.set(Tin.get())
 
-temp_entry = Spinbox(mainframe,from_=900, to=1000, textvariable=Tin)
+temp_entry = Spinbox(mainframe,from_=900, to=1000, textvariable=T)
 temp_entry.grid(column=2, row=2, sticky=(W, E))
 
 temp_label = ttk.Label(mainframe, text="Temperature (C)")
 temp_label.grid(column=1, row=2, sticky=(W, E))
 
-Tin.trace("w", capT)
+#Tin.trace("w", capT)
 
 D = D0 * exp( -Q / (R * (273 + T.get())))
 
