@@ -1,14 +1,12 @@
-import matplotlib as plt
+import numpy as np
 from math import *
 from scipy.special import erfinv
 from tkinter import *
 from tkinter import ttk
+import matplotlib as plt
+import matplotlib.pyplot as pp
 import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_agg import FigureCanvasAgg
-
-#x = 2 * erfinv(z) * sqrt(D * time)
-#time = pow(x/(2* erfinv(z))), 2) / D
-#T = -Q/(R*log(D/D0)) - 273
 
 class Calculator:
 
@@ -43,8 +41,17 @@ class Calculator:
         self.T = -Calculator.Q / (Calculator.R * log(self.D / self.D0)) - 273
 
 class Graph:
+    
+    def __init__(self):
+        self.X = np.linspace(0, 2 * np.pi, 50)
+        self.Y = np.sin(self.X)
+        self.fig = plt.figure.Figure(figsize=(6.5, 3.25))
+        self.ax = self.fig.add_axes([0, 0, 1, 1])
 
-    fig = plt.figure.Figure(figsize=(8, 4))
+        self.ax.plot(self.X, self.Y)
+        self.ax.set_xlabel("Donkey bux")
+        self.ax.set_ylabel("Tyme")
+        self.ax.set_title("Great title")
 
 def draw_figure(canvas, figure, loc=(0, 0)):
     """ 
@@ -96,7 +103,6 @@ def main():
     variable_inspect = ttk.Label(mainframe)
 
     canvas = Canvas(mainframe, width=640, height=320)
-
     fig_photo =  draw_figure(canvas, graph.fig)
 
     def init():
@@ -121,7 +127,7 @@ def main():
         output_entry.grid(column=2, row=4, sticky=(W, E))
         output_label.grid(column=1, row=4, sticky=(W, E))
 
-        variable_inspect.grid(column=1, row=6, sticky=(W, E))
+        variable_inspect.grid(column=1, row=6, columnspan=4, sticky=(W, E))
         
         calculate.grid(column=2, row=5, sticky=(W, E))
         calculate.config(command=update)
