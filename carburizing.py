@@ -143,7 +143,7 @@ def main():
         output_entry.grid(column=2, row=4, sticky=(W, E))
         output_label.grid(column=1, row=4, sticky=(W, E))
 
-        variable_inspect.grid(column=1, row=6, columnspan=4, sticky=(W, E))
+        variable_inspect.grid(column=1, row=6, columnspan=4, rowspan=2, sticky=(W, E))
         
         calculate.grid(column=2, row=5, sticky=(W, E))
         calculate.config(command=update)
@@ -161,6 +161,9 @@ def main():
         graph.plot(X, Y)
         graph.labels("Depth (cm)", "Concentration @ Depth (%C)", "Carburization")
         fig_photo = draw_figure(canvas, graph.fig)
+        
+        set_debug_string = "X: " + str(X) + " Y: " + str(Y)
+        return set_debug_string
         
     # these callbacks are bound to the calculations
     def selectC0(*args):
@@ -181,11 +184,14 @@ def main():
         root.update_idletasks()
 
     #debug callback
-    def update_debug():
+    def update_debug(debug_string=None):
         #var_string = "D: " + str(calc.D) + " Cx: " + str(calc.Cx) + " z: " + str(calc.z) + " x: " + str(calc.x)
         #x0, y0, w, h = graph.ax.get_position().bounds
         #var_string = "x0: " + str(x0) + " y0: " + str(y0) + " w: " + str(w) + " h: " + str(h)
-        var_string = "C0: " + str(calc.C0)
+        if debug_string == None:
+            var_string = "C0: " + str(calc.C0)
+        else:
+            var_string = debug_string
         variable_inspect.configure(text=var_string)
         root.update_idletasks()
 
@@ -193,8 +199,8 @@ def main():
     def update():
         update_variables()
         update_calc()
-        set_graph()
-        update_debug()
+        debug = set_graph()
+        update_debug(debug)
 
     init()
     
