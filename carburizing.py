@@ -1,12 +1,14 @@
-import numpy as np
 from math import *
+import numpy as np
+from scipy.special import erf
 from scipy.special import erfinv
 from tkinter import *
 from tkinter import ttk
 import matplotlib as plt
-#import matplotlib.pyplot as pp
 import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_agg import FigureCanvasAgg
+
+# Cx = Cs - (Cs - Co) * erf(x / (2 * (Do * t1 * exp(-Q / (R * T1)))))
 
 class Calculator:
 
@@ -42,17 +44,26 @@ class Calculator:
 
 class Graph:
     
-    def __init__(self):
-        self.X = np.linspace(0, 2 * np.pi, 50)
-        self.Y = np.sin(self.X)
-        #self.fig, self.ax = pp.subplots(figsize=(6.5, 3.25), constrained_layout=True)
+    def __init__(self, X=None, Y=None):
+        if X == None: self.X = np.linspace(0, 2 * np.pi, 50)
+        if Y == None: self.Y = np.sin(self.X)
         self.fig = plt.figure.Figure(figsize=(6.5, 3.25))
         self.ax = self.fig.add_axes([0.110, 0.15, 0.85, 0.75])
 
         self.ax.plot(self.X, self.Y)
-        self.ax.set_xlabel("Donkey bux")
-        self.ax.set_ylabel("Tyme")
-        self.ax.set_title("Great title")
+        self.ax.set_xlabel("Depth (cm)")
+        self.ax.set_ylabel("Concentration @ Depth (%C)")
+        self.ax.set_title("Carburization")
+
+    def labels(self, xlabel=None, ylabel=None, title=None):
+        if xlabel != None: self.ax.set_xlabel(xlabel)
+        if ylabel != None: self.ax.set_ylabel(ylabel)
+        if title  != None: self.ax.set_title(title)
+
+    def plot(self, X, Y):
+        self.X = X
+        self.Y = Y
+        self.ax.plot(self.X, self.Y)
 
 def draw_figure(canvas, figure, loc=(0, 0)):
     """ 
@@ -177,47 +188,13 @@ if __name__=="__main__":
 
 """
 Do=0.23; R=1.987; Q=32900; Cs=1.3;
-x=0:.0005:.01; # 0 to .01 increments of .0005
-prompt='what is the value for T1?';
-T1=input(prompt);
-prompt='what is the value for T2?';
-T2=input(prompt);
-prompt='what is the value for T3?';
-T3=input(prompt);
-prompt='what is the value for t1?';
-t1=input(prompt);
-prompt='what is the value for t2?';
-t2=input(prompt);
-prompt='what is the value for t3?';
-t3=input(prompt);
-prompt='what is the value for t4?';
-t4=input(prompt);
-prompt='what is the value for Co?';
-Co=input(prompt);
+
+x=0:.0005:.01; # 0 to .01 increments of .0005 # 0 to 3 instead
+
 Cx1=Cs-(Cs-Co)*erf(x/(2*(Do*t1*exp(-Q/(R*T1)))));
-Cx2=Cs-(Cs-Co)*erf(x/(2*(Do*t2*exp(-Q/(R*T1)))));
-Cx3=Cs-(Cs-Co)*erf(x/(2*(Do*t3*exp(-Q/(R*T1)))));
-Cx4=Cs-(Cs-Co)*erf(x/(2*(Do*t4*exp(-Q/(R*T1)))));
-Cx5=Cs-(Cs-Co)*erf(x/(2*(Do*t1*exp(-Q/(R*T2)))));
-Cx6=Cs-(Cs-Co)*erf(x/(2*(Do*t2*exp(-Q/(R*T2)))));
-Cx7=Cs-(Cs-Co)*erf(x/(2*(Do*t3*exp(-Q/(R*T2)))));
-Cx8=Cs-(Cs-Co)*erf(x/(2*(Do*t4*exp(-Q/(R*T2)))));
-Cx9=Cs-(Cs-Co)*erf(x/(2*(Do*t1*exp(-Q/(R*T3)))));
-Cx10=Cs-(Cs-Co)*erf(x/(2*(Do*t2*exp(-Q/(R*T3)))));
-Cx11=Cs-(Cs-Co)*erf(x/(2*(Do*t3*exp(-Q/(R*T3)))));
-Cx12=Cs-(Cs-Co)*erf(x/(2*(Do*t4*exp(-Q/(R*T3)))));
+
 plot(x,Cx1,'g');hold on
-plot(x,Cx2,'b');hold on
-plot(x,Cx3,'r');hold on
-plot(x,Cx4,'c');hold on
-plot(x,Cx5,'--g');hold on
-plot(x,Cx6,'--b');hold on
-plot(x,Cx7,'--r');hold on
-plot(x,Cx8,'--c');hold on
-plot(x,Cx9,':g');hold on
-plot(x,Cx10,':b');hold on
-plot(x,Cx11,':r');hold on
-plot(x,Cx12,':c');hold off
+
 xlabel('depth (cm)');
 ylabel('concentration @ depth(%C)');
 title('Carburization');
