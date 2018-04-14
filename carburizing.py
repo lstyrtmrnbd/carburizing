@@ -44,13 +44,11 @@ class Calculator:
 
 class Graph:
 
-    fig = plt.figure.Figure(figsize=(2, 1))
+    fig = plt.figure.Figure(figsize=(8, 4))
 
 def draw_figure(canvas, figure, loc=(0, 0)):
-    """ Draw a matplotlib figure onto a Tk canvas
-
-    loc: location of top-left corner of figure on canvas in pixels.
-    Inspired by matplotlib source: lib/matplotlib/backends/backend_tkagg.py
+    """ 
+    Draw a matplotlib figure onto a Tk canvas
     """
     figure_canvas_agg = FigureCanvasAgg(figure)
     figure_canvas_agg.draw()
@@ -75,7 +73,7 @@ def main():
     graph = Graph()
         
     root = Tk()
-    mainframe = ttk.Frame(root, padding="3 3 12 12")
+    mainframe = ttk.Frame(root, padding="3 3 3 3")
 
     tempt = DoubleVar()
     steel = StringVar()
@@ -123,9 +121,9 @@ def main():
         output_entry.grid(column=2, row=4, sticky=(W, E))
         output_label.grid(column=1, row=4, sticky=(W, E))
 
-        variable_inspect.grid(column=1, row=5, sticky=(W, E))
+        variable_inspect.grid(column=1, row=6, sticky=(W, E))
         
-        calculate.grid(column=1, row=6, sticky=(W, E))
+        calculate.grid(column=2, row=5, sticky=(W, E))
         calculate.config(command=update)
 
         canvas.grid(column=3, row=1, columnspan=5, rowspan=5, sticky=N+W)
