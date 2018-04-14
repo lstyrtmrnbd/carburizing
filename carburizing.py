@@ -4,7 +4,7 @@ from scipy.special import erfinv
 from tkinter import *
 from tkinter import ttk
 import matplotlib as plt
-import matplotlib.pyplot as pp
+#import matplotlib.pyplot as pp
 import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
@@ -45,8 +45,9 @@ class Graph:
     def __init__(self):
         self.X = np.linspace(0, 2 * np.pi, 50)
         self.Y = np.sin(self.X)
+        #self.fig, self.ax = pp.subplots(figsize=(6.5, 3.25), constrained_layout=True)
         self.fig = plt.figure.Figure(figsize=(6.5, 3.25))
-        self.ax = self.fig.add_axes([0, 0, 1, 1])
+        self.ax = self.fig.add_axes([0.110, 0.15, 0.85, 0.75])
 
         self.ax.plot(self.X, self.Y)
         self.ax.set_xlabel("Donkey bux")
@@ -157,6 +158,8 @@ def main():
     #debug callback
     def update_debug():
         #var_string = "D: " + str(calc.D) + " Cx: " + str(calc.Cx) + " z: " + str(calc.z) + " x: " + str(calc.x)
+        #x0, y0, w, h = graph.ax.get_position().bounds
+        #var_string = "x0: " + str(x0) + " y0: " + str(y0) + " w: " + str(w) + " h: " + str(h)
         var_string = "C0: " + str(calc.C0)
         variable_inspect.configure(text=var_string)
         root.update_idletasks()
