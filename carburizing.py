@@ -17,7 +17,7 @@ class Calculator:
     Cs = 1.3
 
     def __init__(self):
-        self.D0 = 0.23 * 60 # cm^2 / min // changes with C0
+        self.D0 = 0.23 * 60 # cm^2 / min #\\ changes with C0
         self.T = 950        # temperature (C)
         self.C0 = .18
         self.time = 60      # min
@@ -42,9 +42,37 @@ class Calculator:
     def solve_tempt(self):
         self.T = -Calculator.Q / (Calculator.R * log(self.D / self.D0)) - 273
 
+class Graph:
+
+    fig = plt.figure.Figure(figsize=(2, 1))
+
+def draw_figure(canvas, figure, loc=(0, 0)):
+    """ Draw a matplotlib figure onto a Tk canvas
+
+    loc: location of top-left corner of figure on canvas in pixels.
+    Inspired by matplotlib source: lib/matplotlib/backends/backend_tkagg.py
+    """
+    figure_canvas_agg = FigureCanvasAgg(figure)
+    figure_canvas_agg.draw()
+    figure_x, figure_y, figure_w, figure_h = figure.bbox.bounds
+    figure_w, figure_h = int(figure_w), int(figure_h)
+    photo = PhotoImage(master=canvas, width=figure_w, height=figure_h)
+
+    # Position: convert from top-left anchor to center anchor
+    canvas.create_image(loc[0] + figure_w/2, loc[1] + figure_h/2, image=photo)
+
+    # Unfortunately, there's no accessor for the pointer to the native renderer
+    tkagg.blit(photo, figure_canvas_agg.get_renderer()._renderer, colormode=2)
+
+    # Return a handle which contains a reference to the photo object
+    # which must be kept live or else the picture disappears
+    return photo
+        
 def main():
         
     calc = Calculator()
+
+    graph = Graph()
         
     root = Tk()
     mainframe = ttk.Frame(root, padding="3 3 12 12")
@@ -71,7 +99,11 @@ def main():
 
     canvas = Canvas(mainframe, width=640, height=320)
 
-    def init():      
+    fig_photo =  draw_figure(canvas, graph.fig)
+
+    def init():
+        root.title("Carburization Penetration Depth")
+        
         tempt.set(950)
         steel.set('1018')
         time.set(60)
@@ -79,19 +111,15 @@ def main():
         mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
         mainframe.columnconfigure(0, weight=1)
         mainframe.rowconfigure(0, weight=1)
-
+        
         temp_entry.grid(column=2, row=2, sticky=(W, E))
         temp_label.grid(column=1, row=2, sticky=(W, E))
-
         steel_entry['values'] = ('1018', '1045')
         steel_entry.grid(column=2, row=1, sticky=(W, E))
         steel_entry.bind("<<ComboboxSelected>>", selectC0)
-
         steel_label.grid(column=1, row=1, sticky=(W, E))
-
         time_entry.grid(column=2, row=3, sticky=(W, E))
         time_label.grid(column=1, row=3, sticky=(W, E))
-
         output_entry.grid(column=2, row=4, sticky=(W, E))
         output_label.grid(column=1, row=4, sticky=(W, E))
 
@@ -111,6 +139,7 @@ def main():
         elif steel.get() == '1045':
             calc.C0 = .45
 
+    # sync input with calc
     def update_variables():
         calc.T = tempt.get()
         calc.time = time.get()
@@ -134,31 +163,10 @@ def main():
         update_calc()
         update_debug()
 
-    def draw_figure(canvas, figure, loc=(0, 0)):
-        """ Draw a matplotlib figure onto a Tk canvas
-
-        loc: location of top-left corner of figure on canvas in pixels.
-        Inspired by matplotlib source: lib/matplotlib/backends/backend_tkagg.py
-        """
-        figure_canvas_agg = FigureCanvasAgg(figure)
-        figure_canvas_agg.draw()
-        figure_x, figure_y, figure_w, figure_h = figure.bbox.bounds
-        figure_w, figure_h = int(figure_w), int(figure_h)
-        photo = tk.PhotoImage(master=canvas, width=figure_w, height=figure_h)
-
-        # Position: convert from top-left anchor to center anchor
-        canvas.create_image(loc[0] + figure_w/2, loc[1] + figure_h/2, image=photo)
-
-        # Unfortunately, there's no accessor for the pointer to the native renderer
-        tkagg.blit(photo, figure_canvas_agg.get_renderer()._renderer, colormode=2)
-
-        # Return a handle which contains a reference to the photo object
-        # which must be kept live or else the picture disappears
-        return photo
-
     init()
     
-main()
+if __name__=="__main__":
+   main()
 
 """
 Do=0.23; R=1.987; Q=32900; Cs=1.3;
