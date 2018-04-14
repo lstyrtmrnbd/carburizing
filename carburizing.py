@@ -42,6 +42,9 @@ class Calculator:
     def solve_tempt(self):
         self.T = -Calculator.Q / (Calculator.R * log(self.D / self.D0)) - 273
 
+    def cx_solver(self):
+        return lambda x: Calculator.Cs - (Calculator.Cs - self.C0) * erf(x / (2 * (self.D0 * self.time * exp(-Calculator.Q / (Calculator.R * self.T)))))
+
 class Graph:
     
     def __init__(self, X=None, Y=None):
@@ -63,6 +66,7 @@ class Graph:
     def plot(self, X, Y):
         self.X = X
         self.Y = Y
+        self.ax.clear()
         self.ax.plot(self.X, self.Y)
 
 def draw_figure(canvas, figure, loc=(0, 0)):
@@ -148,6 +152,16 @@ def main():
 
         root.mainloop() # sticks in here and handles events
 
+    def set_graph():
+        nonlocal fig_photo
+        X = np.arange(0, calc.x, 0.005)
+        Cx = np.vectorize(calc.cx_solver())
+        Y = Cx(X)
+
+        graph.plot(X, Y)
+        graph.labels("Depth (cm)", "Concentration @ Depth (%C)", "Carburization")
+        fig_photo = draw_figure(canvas, graph.fig)
+        
     # these callbacks are bound to the calculations
     def selectC0(*args):
         if steel.get() == '1018':
@@ -179,6 +193,7 @@ def main():
     def update():
         update_variables()
         update_calc()
+        set_graph()
         update_debug()
 
     init()
