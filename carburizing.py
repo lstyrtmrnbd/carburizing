@@ -185,13 +185,16 @@ def main():
 
     #debug callback
     def update_debug(debug_string=None):
-        #var_string = "D: " + str(calc.D) + " Cx: " + str(calc.Cx) + " z: " + str(calc.z) + " x: " + str(calc.x)
-        #x0, y0, w, h = graph.ax.get_position().bounds
-        #var_string = "x0: " + str(x0) + " y0: " + str(y0) + " w: " + str(w) + " h: " + str(h)
+        calc_vars_check = "D: " + str(calc.D) + " Cx: " + str(calc.Cx) + " z: " + str(calc.z) + " x: " + str(calc.x)
+        x0, y0, w, h = graph.ax.get_position().bounds
+        ax_size_check = "x0: " + str(x0) + " y0: " + str(y0) + " w: " + str(w) + " h: " + str(h)
+        C0_check = "C0: " + str(calc.C0)
+        
         if debug_string == None:
-            var_string = "C0: " + str(calc.C0)
+            var_string = C0_check
         else:
             var_string = debug_string
+            
         variable_inspect.configure(text=var_string)
         root.update_idletasks()
 
