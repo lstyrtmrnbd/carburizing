@@ -203,7 +203,7 @@ def main():
         update_variables()
         update_calc()
         debug = set_graph()
-        update_debug(debug)
+        #update_debug(debug)
 
     init()
     
