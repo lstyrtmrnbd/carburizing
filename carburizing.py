@@ -43,7 +43,7 @@ class Calculator:
         self.T = -Calculator.Q / (Calculator.R * log(self.D / self.D0)) - 273
 
     def cx_solver(self):
-        return lambda x: Calculator.Cs - (Calculator.Cs - self.C0) * erf(x / (2 * (self.D0 * self.time * exp(-Calculator.Q / (Calculator.R * self.T)))))
+        return lambda x: Calculator.Cs - (Calculator.Cs - self.C0) * erf(x / (2 * (self.D0 * (60 *self.time) * exp(-Calculator.Q / (Calculator.R * (self.T + 273))))))
 
 class Graph:
     
@@ -55,7 +55,7 @@ class Graph:
 
         self.ax.plot(self.X, self.Y)
         self.ax.set_xlabel("Depth (cm)")
-        self.ax.set_ylabel("Concentration @ Depth (%C)")
+        self.ax.set_ylabel("Concentration @ Depth (wt%C)")
         self.ax.set_title("Carburization")
 
     def labels(self, xlabel=None, ylabel=None, title=None):
@@ -159,13 +159,13 @@ def main():
         Y = Cx(X)
 
         graph.plot(X, Y)
-        graph.labels("Depth (cm)", "Concentration @ Depth (%C)", "Carburization")
+        graph.labels("Depth (cm)", "Concentration @ Depth (wt%C)", "Carburization")
         fig_photo = draw_figure(canvas, graph.fig)
         
         set_debug_string = "X: " + str(X) + " Y: " + str(Y)
         return set_debug_string
         
-    # these callbacks are bound to the calculations
+    # steel type selection
     def selectC0(*args):
         if steel.get() == '1018':
             calc.C0 = .18
@@ -177,13 +177,13 @@ def main():
         calc.T = tempt.get()
         calc.time = time.get()
 
-    #recalculate callback
+    # recalculate callback
     def update_calc():
         calc.update()
         depth.set(calc.x)
         root.update_idletasks()
 
-    #debug callback
+    # debug callback
     def update_debug(debug_string=None):
         calc_vars_check = "D: " + str(calc.D) + " Cx: " + str(calc.Cx) + " z: " + str(calc.z) + " x: " + str(calc.x)
         x0, y0, w, h = graph.ax.get_position().bounds
@@ -198,7 +198,7 @@ def main():
         variable_inspect.configure(text=var_string)
         root.update_idletasks()
 
-    #button update callback    
+    # button update callback    
     def update():
         update_variables()
         update_calc()
@@ -209,17 +209,3 @@ def main():
     
 if __name__=="__main__":
    main()
-
-"""
-Do=0.23; R=1.987; Q=32900; Cs=1.3;
-
-x=0:.0005:.01; # 0 to .01 increments of .0005 # 0 to 3 instead
-
-Cx1=Cs-(Cs-Co)*erf(x/(2*(Do*t1*exp(-Q/(R*T1)))));
-
-plot(x,Cx1,'g');hold on
-
-xlabel('depth (cm)');
-ylabel('concentration @ depth(%C)');
-title('Carburization');
-"""
