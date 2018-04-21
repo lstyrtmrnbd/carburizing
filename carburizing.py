@@ -51,7 +51,7 @@ class Graph:
         if X == None: self.X = np.linspace(0, 2 * np.pi, 50)
         if Y == None: self.Y = np.sin(self.X)
         self.fig = plt.figure.Figure(figsize=(6.5, 3.25))
-        self.ax = self.fig.add_axes([0.110, 0.15, 0.85, 0.75])
+        self.ax = self.fig.add_axes([0.110, 0.15, 0.85, 0.75]) # parameter is very specific layout offsets
 
         self.ax.plot(self.X, self.Y)
         self.ax.set_xlabel("Depth (cm)")
@@ -102,6 +102,7 @@ def main():
     steel = StringVar()
     time = DoubleVar()
     depth = DoubleVar()
+    solve_for = StringVar()
 
     temp_entry = Spinbox(mainframe,from_=900, to=1000, textvariable=tempt)
     temp_label = ttk.Label(mainframe, text="Temperature (C)")
@@ -115,6 +116,10 @@ def main():
     output_entry = ttk.Entry(mainframe, width=7, textvariable=depth)
     output_label = ttk.Label(mainframe, text="Depth (cm):")
 
+    radio_tempt = ttk.Radiobutton(mainframe, variable=solve_for, value="temperature")
+    radio_time = ttk.Radiobutton(mainframe, variable=solve_for, value="time")
+    radio_depth = ttk.Radiobutton(mainframe, variable=solve_for, value="depth")
+    
     calculate = ttk.Button(mainframe, text="Calculate")
     variable_inspect = ttk.Label(mainframe)
 
@@ -127,28 +132,36 @@ def main():
         tempt.set(950)
         steel.set('1018')
         time.set(60)
+        solve_for.set("depth")
 
         mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
         mainframe.columnconfigure(0, weight=1)
         mainframe.rowconfigure(0, weight=1)
-        
-        temp_entry.grid(column=2, row=2, sticky=(W, E))
-        temp_label.grid(column=1, row=2, sticky=(W, E))
-        steel_entry['values'] = ('1018', '1045')
-        steel_entry.grid(column=2, row=1, sticky=(W, E))
-        steel_entry.bind("<<ComboboxSelected>>", selectC0)
-        steel_label.grid(column=1, row=1, sticky=(W, E))
-        time_entry.grid(column=2, row=3, sticky=(W, E))
-        time_label.grid(column=1, row=3, sticky=(W, E))
-        output_entry.grid(column=2, row=4, sticky=(W, E))
-        output_label.grid(column=1, row=4, sticky=(W, E))
 
+        radio_tempt.grid(column=3, row=2)
+        radio_time.grid(column=3, row=3)
+        radio_depth.grid(column=3, row=4)
+        
+        temp_label.grid(column=1, row=2, sticky=(W, E))        
+        temp_entry.grid(column=2, row=2, sticky=(W, E))
+
+        steel_label.grid(column=1, row=1, sticky=(W, E))
+        steel_entry.grid(column=2, row=1, sticky=(W, E))
+        steel_entry['values'] = ('1018', '1045')
+        steel_entry.bind("<<ComboboxSelected>>", selectC0)
+
+        time_label.grid(column=1, row=3, sticky=(W, E))        
+        time_entry.grid(column=2, row=3, sticky=(W, E))
+
+        output_label.grid(column=1, row=4, sticky=(W, E))
+        output_entry.grid(column=2, row=4, sticky=(W, E))
+        
         variable_inspect.grid(column=1, row=6, columnspan=4, rowspan=2, sticky=(W, E))
         
         calculate.grid(column=2, row=5, sticky=(W, E))
         calculate.config(command=update)
 
-        canvas.grid(column=3, row=1, columnspan=5, rowspan=5, sticky=N+W)
+        canvas.grid(column=4, row=1, columnspan=5, rowspan=5, sticky=N+W)
 
         root.mainloop() # sticks in here and handles events
 
@@ -174,13 +187,29 @@ def main():
 
     # sync input with calc
     def update_variables():
-        calc.T = tempt.get()
-        calc.time = time.get()
+        if solve_for == "depth":
+            calc.T = tempt.get()
+            calc.time = time.get()
+        elif solve_for == "temperature":
+            calc.time = time.get()
+            calc.x = depth.get()
+        elif solve_for == "time":
+            calc.T = tempt.get()
+            calc.x = depth.get()
 
     # recalculate callback
+    # branch for different terms here
     def update_calc():
-        calc.update()
-        depth.set(calc.x)
+        if solve_for == "depth":
+            calc.update()
+            depth.set(calc.x)
+        elif solve_for == "temperature":
+            calc.solve_tempt()
+            tempt.set(calc.T)
+        elif solve_for == "time":
+            calc.solve_time()
+            time.set(calc.time)
+            
         root.update_idletasks()
 
     # debug callback
@@ -189,9 +218,10 @@ def main():
         x0, y0, w, h = graph.ax.get_position().bounds
         ax_size_check = "x0: " + str(x0) + " y0: " + str(y0) + " w: " + str(w) + " h: " + str(h)
         C0_check = "C0: " + str(calc.C0)
+        x_ticks = graph.ax.get_xticks()
         
         if debug_string == None:
-            var_string = C0_check
+            var_string = x_ticks
         else:
             var_string = debug_string
             
@@ -202,8 +232,8 @@ def main():
     def update():
         update_variables()
         update_calc()
-        debug = set_graph()
-        #update_debug(debug)
+        set_graph()
+        update_debug()
 
     init()
     
