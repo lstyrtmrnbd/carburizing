@@ -114,17 +114,17 @@ def main():
     depth = DoubleVar()
     solve_for = StringVar()
 
-    temp_entry = Spinbox(mainframe,from_=900, to=1000, textvariable=tempt)
+    temp_entry = ttk.Entry(mainframe, textvariable=tempt)
     temp_label = ttk.Label(mainframe, text="Temperature (C)")
     
     steel_entry = ttk.Combobox(mainframe, width=7, textvariable=steel)
-    steel_label = ttk.Label(mainframe, text="Type of Steel:")
+    steel_label = ttk.Label(mainframe, text="Type of Steel")
 
     time_entry = ttk.Entry(mainframe, width=7, textvariable=time)
     time_label = ttk.Label(mainframe, text="Time (min.)")
 
     output_entry = ttk.Entry(mainframe, width=7, textvariable=depth)
-    output_label = ttk.Label(mainframe, text="Depth (cm):")
+    output_label = ttk.Label(mainframe, text="Depth (cm)")
 
     radio_tempt = ttk.Radiobutton(mainframe, variable=solve_for, value="temperature")
     radio_time = ttk.Radiobutton(mainframe, variable=solve_for, value="time")
@@ -149,9 +149,10 @@ def main():
         
         root.config(menu=menubar)
         
-        tempt.set(950)
+        tempt.set(calc.T)
         steel.set('1018')
-        time.set(60)
+        time.set(calc.time)
+        depth.set(truncate(calc.x))
         solve_for.set("depth")
 
         mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
@@ -182,6 +183,8 @@ def main():
         calculate.config(command=update)
 
         canvas.grid(column=4, row=1, columnspan=5, rowspan=5, sticky=N+W)
+
+        set_graph()
 
         root.mainloop() # sticks in here and handles events
 
