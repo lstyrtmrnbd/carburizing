@@ -91,9 +91,9 @@ def draw_figure(canvas, figure, loc=(0, 0)):
     # which must be kept live or else the picture disappears
     return photo
 
-def truncate(number, decs):
+def truncate(number, decs=3):
     places = Decimal(10) ** -decs
-    return Decimal(number).quantize(places, rounding=decimal.ROUND_DOWN)
+    return Decimal(number).quantize(places, rounding=ROUND_HALF_UP)
     
 def main():     
     calc = Calculator()
@@ -224,26 +224,27 @@ def main():
         solve = solve_for.get()
         if solve == "depth":
             calc.update()
-            depth.set(calc.x)
+            depth.set(truncate(calc.x))
         elif solve == "temperature":
             calc.solve_tempt()
-            tempt.set(calc.T)
+            tempt.set(truncate(calc.T))
         elif solve == "time":
             calc.solve_time()
-            time.set(calc.time)
+            time.set(truncate(calc.time))
             
         root.update_idletasks()
 
     # debugging write out
     def update_debug(debug_string=None):
         calc_vars_check = "D: " + str(calc.D) + " Cx: " + str(calc.Cx) + " z: " + str(calc.z) + " x: " + str(calc.x)
+        out_vars_check = "x: " + str(calc.x) + " time: " + str(calc.time) + " temp: " + str(calc.T)
         x0, y0, w, h = graph.ax.get_position().bounds
         ax_size_check = "x0: " + str(x0) + " y0: " + str(y0) + " w: " + str(w) + " h: " + str(h)
         C0_check = "C0: " + str(calc.C0)
         x_ticks = graph.ax.get_xticks()
         
         if debug_string == None:
-            var_string = calc_vars_check
+            var_string = out_vars_check
         else:
             var_string = debug_string
             
