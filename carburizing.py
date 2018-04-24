@@ -4,6 +4,7 @@ from scipy.special import erf
 from scipy.special import erfinv
 from tkinter import *
 from tkinter import ttk
+from tkinter import filedialog
 import matplotlib as plt
 import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_agg import FigureCanvasAgg
@@ -139,7 +140,7 @@ def main():
         filemenu.add_command(label="Quit", command=root.quit)
 
         menubar.add_cascade(label="Options", menu=optionsmenu)
-        optionsmenu.add_command(label="Imperial/Metric", command=export_graph)
+        optionsmenu.add_command(label="Imperial/Metric", command=do_nothing)
         
         root.config(menu=menubar)
         
@@ -252,6 +253,10 @@ def main():
     ## --- menu callbacks ---
     # File -> Export Graph
     def export_graph():
+        savename = filedialog.asksaveasfilename(defaultextension=".png")
+        graph.fig.savefig(savename, format="png")
+
+    def do_nothing():
         return None
 
     init()
