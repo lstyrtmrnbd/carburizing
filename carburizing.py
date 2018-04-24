@@ -91,13 +91,10 @@ def draw_figure(canvas, figure, loc=(0, 0)):
     # which must be kept live or else the picture disappears
     return photo
 
-def truncate(number, decimals):
-    tmp_str = repr(number).split('.')
-    if(len(tmp_str == 1)):
-        return int(tmp_str[0])
-    else:
-        return float(tmp_str[0] + '.' + tmp_str[1][:d])
-        
+def truncate(number, decs):
+    places = Decimal(10) ** -decs
+    return Decimal(number).quantize(places, rounding=decimal.ROUND_DOWN)
+    
 def main():     
     calc = Calculator()
 
@@ -244,7 +241,7 @@ def main():
         x_ticks = graph.ax.get_xticks()
         
         if debug_string == None:
-            var_string = x_ticks
+            var_string = calc_vars_check
         else:
             var_string = debug_string
             
