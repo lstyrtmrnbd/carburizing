@@ -89,15 +89,19 @@ def draw_figure(canvas, figure, loc=(0, 0)):
     # which must be kept live or else the picture disappears
     return photo
         
-def main():
-        
+def main():     
     calc = Calculator()
 
     graph = Graph()
         
     root = Tk()
+
     mainframe = ttk.Frame(root, padding="3 3 3 3")
 
+    menubar = Menu(root)
+    filemenu = Menu(menubar, tearoff=0)
+    optionsmenu = Menu(menubar, tearoff=0)
+    
     tempt = DoubleVar()
     steel = StringVar()
     time = DoubleVar()
@@ -128,6 +132,16 @@ def main():
 
     def init():
         root.title("Carburization Penetration Depth")
+
+        menubar.add_cascade(label="File", menu=filemenu)
+        filemenu.add_command(label="Export Graph", command=export_graph)
+        filemenu.add_separator()
+        filemenu.add_command(label="Quit", command=root.quit)
+
+        menubar.add_cascade(label="Options", menu=optionsmenu)
+        optionsmenu.add_command(label="Imperial/Metric", command=export_graph)
+        
+        root.config(menu=menubar)
         
         tempt.set(950)
         steel.set('1018')
@@ -165,6 +179,7 @@ def main():
 
         root.mainloop() # sticks in here and handles events
 
+    # graph write out
     def set_graph():
         nonlocal fig_photo
         X = np.arange(0, calc.x, 0.005)
@@ -197,8 +212,7 @@ def main():
             calc.T = tempt.get()
             calc.x = depth.get()
 
-    # recalculate callback
-    # branch for different terms here
+    # recalculations made here
     def update_calc():
         if solve_for == "depth":
             calc.update()
@@ -212,7 +226,7 @@ def main():
             
         root.update_idletasks()
 
-    # debug callback
+    # debugging write out
     def update_debug(debug_string=None):
         calc_vars_check = "D: " + str(calc.D) + " Cx: " + str(calc.Cx) + " z: " + str(calc.z) + " x: " + str(calc.x)
         x0, y0, w, h = graph.ax.get_position().bounds
@@ -228,12 +242,17 @@ def main():
         variable_inspect.configure(text=var_string)
         root.update_idletasks()
 
-    # button update callback    
+    # button update    
     def update():
         update_variables()
         update_calc()
         set_graph()
         update_debug()
+
+    ## --- menu callbacks ---
+    # File -> Export Graph
+    def export_graph():
+        return None
 
     init()
     
