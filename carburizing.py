@@ -1,4 +1,5 @@
 from math import *
+from decimal import *
 import numpy as np
 from scipy.special import erf
 from scipy.special import erfinv
@@ -89,6 +90,13 @@ def draw_figure(canvas, figure, loc=(0, 0)):
     # Return a handle which contains a reference to the photo object
     # which must be kept live or else the picture disappears
     return photo
+
+def truncate(number, decimals):
+    tmp_str = repr(number).split('.')
+    if(len(tmp_str == 1)):
+        return int(tmp_str[0])
+    else:
+        return float(tmp_str[0] + '.' + tmp_str[1][:d])
         
 def main():     
     calc = Calculator()
@@ -191,8 +199,8 @@ def main():
         graph.labels("Depth (cm)", "Concentration @ Depth (wt%C)", "Carburization")
         fig_photo = draw_figure(canvas, graph.fig)
         
-        set_debug_string = "X: " + str(X) + " Y: " + str(Y)
-        return set_debug_string
+        debug_string = "X: " + str(X) + " Y: " + str(Y)
+        return debug_string
         
     # steel type selection
     def selectC0(*args):
@@ -254,8 +262,10 @@ def main():
     # File -> Export Graph
     def export_graph():
         savename = filedialog.asksaveasfilename(defaultextension=".png")
-        graph.fig.savefig(savename, format="png")
+        if savename != "":
+            graph.fig.savefig(savename, format="png")
 
+    # placeholder command
     def do_nothing():
         return None
 
