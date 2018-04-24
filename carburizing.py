@@ -208,25 +208,27 @@ def main():
 
     # sync input with calc
     def update_variables():
-        if solve_for == "depth":
+        solve = solve_for.get()
+        if solve == "depth":
             calc.T = tempt.get()
             calc.time = time.get()
-        elif solve_for == "temperature":
+        elif solve == "temperature":
             calc.time = time.get()
             calc.x = depth.get()
-        elif solve_for == "time":
+        elif solve == "time":
             calc.T = tempt.get()
             calc.x = depth.get()
 
     # recalculations made here
     def update_calc():
-        if solve_for == "depth":
+        solve = solve_for.get()
+        if solve == "depth":
             calc.update()
             depth.set(calc.x)
-        elif solve_for == "temperature":
+        elif solve == "temperature":
             calc.solve_tempt()
             tempt.set(calc.T)
-        elif solve_for == "time":
+        elif solve == "time":
             calc.solve_time()
             time.set(calc.time)
             
