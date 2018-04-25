@@ -21,12 +21,13 @@ class Calculator:
         self.T = 950        # temperature (C)
         self.C0 = .18
         self.time = 60      # min
+        self.Cs = 1.3
         
         self.update()
         self.solve_x()
         
     def update(self):
-        self.Cs = (self.T - 485) / 285
+        #self.Cs = (self.T - 485) / 285 # perverts resultant x value
         self.D = self.D0 * exp( -Calculator.Q / (Calculator.R * (273 + self.T)))  
         self.Cx = self.C0 + pow(10, -16)
         self.z = (self.Cs - self.Cx) / (self.Cs - self.C0)
