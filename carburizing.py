@@ -76,7 +76,8 @@ class Solve:
     # return the same cx_solver as a Calculator but with time hooked
     def cx_ct(calc, time):
         return lambda x: Calculator.Cs - (Calculator.Cs - calc.C0) * erf(x / (2 * (calc.D0 * (60 * time) * exp(-Calculator.Q / (Calculator.R * (calc.T + 273))))))
-    
+
+## maintains the plotting state and functionality
 class Graph:
     
     def __init__(self, X=None, Y=None):
@@ -126,10 +127,11 @@ def draw_figure(canvas, figure, loc=(0, 0)):
     # which must be kept live or else the picture disappears
     return photo
 
+## chops off decimals for the calculation results
 def truncate(number, decs=3):
     places = Decimal(10) ** -decs
     return Decimal(number).quantize(places, rounding=ROUND_HALF_UP)
-    
+
 def main():     
     calc = Calculator()
 
@@ -151,23 +153,18 @@ def main():
 
     temp_entry = ttk.Entry(mainframe, textvariable=tempt)
     temp_label = ttk.Label(mainframe, text="Temperature (C)")
-    
     steel_entry = ttk.Combobox(mainframe, width=7, textvariable=steel)
     steel_label = ttk.Label(mainframe, text="Type of Steel")
-
     time_entry = ttk.Entry(mainframe, width=7, textvariable=time)
     time_label = ttk.Label(mainframe, text="Time (min.)")
-
     output_entry = ttk.Entry(mainframe, width=7, textvariable=depth)
     output_label = ttk.Label(mainframe, text="Depth (cm)")
-
     radio_tempt = ttk.Radiobutton(mainframe, variable=solve_for, value="temperature")
     radio_time = ttk.Radiobutton(mainframe, variable=solve_for, value="time")
     radio_depth = ttk.Radiobutton(mainframe, variable=solve_for, value="depth")
     
     calculate = ttk.Button(mainframe, text="Calculate")
     variable_inspect = ttk.Label(mainframe)
-
     canvas = Canvas(mainframe, width=640, height=320)
     fig_photo =  draw_figure(canvas, graph.fig)
 
@@ -178,10 +175,8 @@ def main():
         filemenu.add_command(label="Export Graph", command=export_graph)
         filemenu.add_separator()
         filemenu.add_command(label="Quit", command=root.quit)
-
         menubar.add_cascade(label="Options", menu=optionsmenu)
         optionsmenu.add_command(label="Imperial/Metric", command=do_nothing)
-        
         root.config(menu=menubar)
         
         tempt.set(calc.T)
@@ -193,30 +188,23 @@ def main():
         mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
         mainframe.columnconfigure(0, weight=1)
         mainframe.rowconfigure(0, weight=1)
-
         radio_tempt.grid(column=3, row=2)
         radio_time.grid(column=3, row=3)
         radio_depth.grid(column=3, row=4)
-        
         temp_label.grid(column=1, row=2, sticky=(W, E))        
         temp_entry.grid(column=2, row=2, sticky=(W, E))
-
         steel_label.grid(column=1, row=1, sticky=(W, E))
         steel_entry.grid(column=2, row=1, sticky=(W, E))
         steel_entry['values'] = ('1018', '1045')
         steel_entry.bind("<<ComboboxSelected>>", selectC0)
-
         time_label.grid(column=1, row=3, sticky=(W, E))        
         time_entry.grid(column=2, row=3, sticky=(W, E))
-
         output_label.grid(column=1, row=4, sticky=(W, E))
         output_entry.grid(column=2, row=4, sticky=(W, E))
         
         variable_inspect.grid(column=1, row=6, columnspan=4, rowspan=2, sticky=(W, E))
-        
         calculate.grid(column=2, row=5, sticky=(W, E))
         calculate.config(command=update)
-
         canvas.grid(column=4, row=1, columnspan=5, rowspan=5, sticky=N+W)
 
         set_graph()
@@ -229,8 +217,7 @@ def main():
         X = np.arange(0, calc.x, 0.005)
         Cx = np.vectorize(calc.cx_solver())
         Y = Cx(X)
-
-        
+      
         graph.plot(X, Y)
         graph.labels("Depth (cm)", "Concentration @ Depth (wt%C)", "Carburization")
         fig_photo = draw_figure(canvas, graph.fig)
