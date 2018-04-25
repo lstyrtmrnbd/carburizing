@@ -10,8 +10,7 @@ import matplotlib as plt
 import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
-# Cx = Cs - (Cs - Co) * erf(x / (2 * (Do * t1 * exp(-Q / (R * T1)))))
-
+# holds current time temp and depth and recalculates when necessary
 class Calculator:
 
     R  = 1.987     # cal / mol K
@@ -30,7 +29,7 @@ class Calculator:
         self.Cs = (self.T - 485) / 285
         self.D = self.D0 * exp( -Calculator.Q / (Calculator.R * (273 + self.T)))  
         self.Cx = self.C0 + pow(10, -16)
-        self.z = (Calculator.Cs - self.Cx) / (Calculator.Cs - self.C0)
+        self.z = (self.Cs - self.Cx) / (self.Cs - self.C0)
 
     def solve_x(self):
         self.x = 2 * erfinv(self.z) * sqrt(self.D * self.time)
@@ -42,9 +41,9 @@ class Calculator:
         self.T = -Calculator.Q / (2 * Calculator.R * log(self.x / (2 * sqrt(self.D0 * self.time) * erfinv(self.z)))) - 273
 
     def cx_solver(self):
-        return lambda x: Calculator.Cs - (Calculator.Cs - self.C0) * erf(x / (2 * (self.D0 * (60 * self.time) * exp(-Calculator.Q / (Calculator.R * (self.T + 273))))))
+        return lambda x: self.Cs - (self.Cs - self.C0) * erf(x / (2 * (self.D0 * (60 * self.time) * exp(-Calculator.Q / (Calculator.R * (self.T + 273))))))
 
-# stateless Calculator bits    
+# stateless Calculator alternative and assistant    
 class Solve:
 
     R = 1.87
@@ -54,7 +53,7 @@ class Solve:
         return (temp - 485) / 285
 
     def D(D0, temp):
-        return D 
+        return D0 * exp(Q / R * (273 + temp))
     
     def x(z, D, time):
         return 2 * erfinv(z) * sqrt(D * time)
@@ -71,7 +70,6 @@ class Solve:
     def cx_ct(calc, time):
         return lambda x: Calculator.Cs - (Calculator.Cs - calc.C0) * erf(x / (2 * (calc.D0 * (60 * time) * exp(-Calculator.Q / (Calculator.R * (calc.T + 273))))))
     
-
 class Graph:
     
     def __init__(self, X=None, Y=None):
@@ -95,6 +93,11 @@ class Graph:
         self.Y = Y
         self.ax.clear()
         self.ax.plot(self.X, self.Y)
+
+    def multiplot(self, X, *args):
+        self.ax.clear()
+        for Y in args:
+            self.ax.plot(X, Y)
 
 def draw_figure(canvas, figure, loc=(0, 0)):
     """ 
@@ -161,8 +164,6 @@ def main():
     canvas = Canvas(mainframe, width=640, height=320)
     fig_photo =  draw_figure(canvas, graph.fig)
 
-    multi_graph = True
-
     def init():
         root.title("Carburization Penetration Depth")
 
@@ -222,6 +223,7 @@ def main():
         Cx = np.vectorize(calc.cx_solver())
         Y = Cx(X)
 
+        
         graph.plot(X, Y)
         graph.labels("Depth (cm)", "Concentration @ Depth (wt%C)", "Carburization")
         fig_photo = draw_figure(canvas, graph.fig)
@@ -286,8 +288,7 @@ def main():
     def update():
         update_variables()
         update_calc()
-        if multi_graph:
-            set_graph()
+        set_graph()
         update_debug()
 
     ## --- menu callbacks ---
