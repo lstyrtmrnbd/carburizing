@@ -16,7 +16,6 @@ class Calculator:
 
     R  = 1.987     # cal / mol K
     Q  = 32900     # cal / mol
-    Cs = 1.3
 
     def __init__(self):
         self.D0 = 0.23 * 60 # cm^2 / min #\\ changes with C0
@@ -28,6 +27,7 @@ class Calculator:
         self.solve_x()
         
     def update(self):
+        self.Cs = (self.T - 485) / 285
         self.D = self.D0 * exp( -Calculator.Q / (Calculator.R * (273 + self.T)))  
         self.Cx = self.C0 + pow(10, -16)
         self.z = (Calculator.Cs - self.Cx) / (Calculator.Cs - self.C0)
@@ -39,10 +39,38 @@ class Calculator:
         self.time = pow(self.x / (2 * erfinv(self.z)), 2) / self.D
 
     def solve_tempt(self):
-        self.T = -Calculator.Q / (Calculator.R * log(self.D / self.D0)) - 273
+        self.T = -Calculator.Q / (2 * Calculator.R * log(self.x / (2 * sqrt(self.D0 * self.time) * erfinv(self.z)))) - 273
 
     def cx_solver(self):
-        return lambda x: Calculator.Cs - (Calculator.Cs - self.C0) * erf(x / (2 * (self.D0 * (60 *self.time) * exp(-Calculator.Q / (Calculator.R * (self.T + 273))))))
+        return lambda x: Calculator.Cs - (Calculator.Cs - self.C0) * erf(x / (2 * (self.D0 * (60 * self.time) * exp(-Calculator.Q / (Calculator.R * (self.T + 273))))))
+
+# stateless Calculator bits    
+class Solve:
+
+    R = 1.87
+    Q = 32900
+    
+    def Cs(temp):
+        return (temp - 485) / 285
+
+    def D(D0, temp):
+        return D 
+    
+    def x(z, D, time):
+        return 2 * erfinv(z) * sqrt(D * time)
+
+    def time(x, z, D):
+        return pow(x / (2 * erfinv(z)), 2) / D
+
+    def temp(x, D0, time, z):
+        return -Q / (2 * R * log(x / (2 * sqrt(D0 * time) * erfinv(z)))) 
+
+    def cx(Cs, C0, x, D0, time, temp):
+        return lambda x: Cs - (Cs - C0) * erf(x / (2 * (D0 * (60 * time) * exp(-Q / (R * (temp + 273))))))
+
+    def cx_ct(calc, time):
+        return lambda x: Calculator.Cs - (Calculator.Cs - calc.C0) * erf(x / (2 * (calc.D0 * (60 * time) * exp(-Calculator.Q / (Calculator.R * (calc.T + 273))))))
+    
 
 class Graph:
     
@@ -133,6 +161,8 @@ def main():
     canvas = Canvas(mainframe, width=640, height=320)
     fig_photo =  draw_figure(canvas, graph.fig)
 
+    multi_graph = True
+
     def init():
         root.title("Carburization Penetration Depth")
 
@@ -186,7 +216,7 @@ def main():
         root.mainloop() # sticks in here and handles events
 
     # graph write out
-    def set_graph():
+    def set_graph(count=1, multiple=1):
         nonlocal fig_photo
         X = np.arange(0, calc.x, 0.005)
         Cx = np.vectorize(calc.cx_solver())
@@ -256,7 +286,8 @@ def main():
     def update():
         update_variables()
         update_calc()
-        set_graph()
+        if multi_graph:
+            set_graph()
         update_debug()
 
     ## --- menu callbacks ---
