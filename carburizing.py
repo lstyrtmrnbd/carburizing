@@ -10,7 +10,7 @@ import matplotlib as plt
 import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
-# holds current time temp and depth and recalculates when necessary
+## holds current time temp and depth and recalculates when necessary
 class Calculator:
 
     R  = 1.987     # cal / mol K
@@ -43,7 +43,7 @@ class Calculator:
     def cx_solver(self):
         return lambda x: self.Cs - (self.Cs - self.C0) * erf(x / (2 * (self.D0 * (60 * self.time) * exp(-Calculator.Q / (Calculator.R * (self.T + 273))))))
 
-# stateless Calculator alternative and assistant    
+## stateless Calculator alternative and assistant    
 class Solve:
 
     R = 1.87
@@ -73,6 +73,7 @@ class Solve:
     def cx(Cs, C0, x, D0, time, temp):
         return lambda x: Cs - (Cs - C0) * erf(x / (2 * (D0 * (60 * time) * exp(-Q / (R * (temp + 273))))))
 
+    # return the same cx_solver as a Calculator but with time hooked
     def cx_ct(calc, time):
         return lambda x: Calculator.Cs - (Calculator.Cs - calc.C0) * erf(x / (2 * (calc.D0 * (60 * time) * exp(-Calculator.Q / (Calculator.R * (calc.T + 273))))))
     
@@ -222,7 +223,7 @@ def main():
 
         root.mainloop() # sticks in here and handles events
 
-    # graph write out
+    ## graph write out
     def set_graph(count=1, multiple=1):
         nonlocal fig_photo
         X = np.arange(0, calc.x, 0.005)
@@ -237,14 +238,14 @@ def main():
         debug_string = "X: " + str(X) + " Y: " + str(Y)
         return debug_string
         
-    # steel type selection
+    ## steel type selection
     def selectC0(*args):
         if steel.get() == '1018':
             calc.C0 = .18
         elif steel.get() == '1045':
             calc.C0 = .45
 
-    # sync input with calc
+    ## sync input with calc
     def update_variables():
         solve = solve_for.get()
         if solve == "depth":
@@ -257,7 +258,7 @@ def main():
             calc.T = tempt.get()
             calc.x = depth.get()
 
-    # recalculations made here
+    ## recalculations made here
     def update_calc():
         calc.update()
         solve = solve_for.get()
@@ -273,7 +274,7 @@ def main():
             
         root.update_idletasks()
 
-    # debugging write out
+    ## debugging write out
     def update_debug(debug_string=None):
         calc_vars_check = "D: " + str(calc.D) + " Cx: " + str(calc.Cx) + " z: " + str(calc.z) + " x: " + str(calc.x)
         out_vars_check = "x: " + str(calc.x) + " time: " + str(calc.time) + " temp: " + str(calc.T)
@@ -290,7 +291,7 @@ def main():
         variable_inspect.configure(text=var_string)
         root.update_idletasks()
 
-    # button update    
+    ## button update    
     def update():
         update_variables()
         update_calc()
@@ -298,13 +299,13 @@ def main():
         update_debug()
 
     ## --- menu callbacks ---
-    # File -> Export Graph
+    ## File -> Export Graph
     def export_graph():
         savename = filedialog.asksaveasfilename(defaultextension=".png")
         if savename != "":
             graph.fig.savefig(savename, format="png")
 
-    # placeholder command
+    ## placeholder command
     def do_nothing():
         return None
 
