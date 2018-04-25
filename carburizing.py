@@ -54,6 +54,12 @@ class Solve:
 
     def D(D0, temp):
         return D0 * exp(Q / R * (273 + temp))
+
+    def Cx(C0):
+        return C0 + pow(10, -16)
+
+    def z(C0, Cs, Cx):
+        return (Cs - Cx) / (Cs - C0)
     
     def x(z, D, time):
         return 2 * erfinv(z) * sqrt(D * time)
@@ -62,7 +68,7 @@ class Solve:
         return pow(x / (2 * erfinv(z)), 2) / D
 
     def temp(x, D0, time, z):
-        return -Q / (2 * R * log(x / (2 * sqrt(D0 * time) * erfinv(z)))) 
+        return -Q / (2 * R * log(x / (2 * sqrt(D0 * time) * erfinv(z)))) - 273 
 
     def cx(Cs, C0, x, D0, time, temp):
         return lambda x: Cs - (Cs - C0) * erf(x / (2 * (D0 * (60 * time) * exp(-Q / (R * (temp + 273))))))
