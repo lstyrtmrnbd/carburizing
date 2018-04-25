@@ -24,16 +24,13 @@ class Calculator:
         self.C0 = .18
         self.time = 60      # min
         
-        self.D = self.D0 * exp( -Calculator.Q / (Calculator.R * (273 + self.T)))  
-        self.Cx = self.C0 + pow(10, -16)
-        self.z = (Calculator.Cs - self.Cx) / (Calculator.Cs - self.C0)
-        self.x = 2 * erfinv(self.z) * sqrt(self.D * self.time)
-
+        self.update()
+        self.solve_x()
+        
     def update(self):
         self.D = self.D0 * exp( -Calculator.Q / (Calculator.R * (273 + self.T)))  
         self.Cx = self.C0 + pow(10, -16)
         self.z = (Calculator.Cs - self.Cx) / (Calculator.Cs - self.C0)
-        self.x = 2 * erfinv(self.z) * sqrt(self.D * self.time)
 
     def solve_x(self):
         self.x = 2 * erfinv(self.z) * sqrt(self.D * self.time)
@@ -224,9 +221,10 @@ def main():
 
     # recalculations made here
     def update_calc():
+        calc.update()
         solve = solve_for.get()
         if solve == "depth":
-            calc.update()
+            calc.solve_x()
             depth.set(truncate(calc.x))
         elif solve == "temperature":
             calc.solve_tempt()
