@@ -75,7 +75,7 @@ class Solve:
 
     # return the same cx_solver as a Calculator but with time scaled by s
     def cx_time(calc, s):
-        return lambda x: calc.Cs - (calc.Cs - calc.C0) * erf(x / (2 * (calc.D0 * (60 * calc.time * s) * exp(-Calculator.Q / (Calculator.R * (calc.T + 273))))))
+        return lambda x: calc.Cs - (calc.Cs - calc.C0) * erf(x / (2 * (calc.D0 * (60 * calc.time / s) * exp(-Calculator.Q / (Calculator.R * (calc.T + 273))))))
 
 ## maintains the plotting state and functionality
 class Graph:
@@ -166,6 +166,8 @@ def main():
     canvas = Canvas(mainframe, width=640, height=320)
     fig_photo =  draw_figure(canvas, graph.fig)
 
+    multiplot = True
+
     def init():
         root.title("Carburization Penetration Depth")
 
@@ -174,7 +176,7 @@ def main():
         filemenu.add_separator()
         filemenu.add_command(label="Quit", command=root.quit)
         menubar.add_cascade(label="Options", menu=optionsmenu)
-        optionsmenu.add_command(label="Imperial/Metric", command=do_nothing)
+        optionsmenu.add_command(label="Scaled time graphs", command=scaled_graphs)
         root.config(menu=menubar)
         
         tempt.set(calc.T)
@@ -205,18 +207,26 @@ def main():
         calculate.config(command=update)
         canvas.grid(column=4, row=1, columnspan=5, rowspan=5, sticky=N+W)
 
-        set_graph(4, 2) # INTIAL SET_GRAPH()
-
+        # INTIAL SET_GRAPH()
+        if multiplot:
+            set_graph(3, 2) 
+        else:
+            set_graph()
+            
         root.mainloop() # sticks in here and handles events
 
     ## graph write out
-    def set_graph(count=1, multiple=1):
+    def set_graph(count=0, multiple=1):
         nonlocal fig_photo
         X = np.arange(0, calc.x, 0.005)
         Ylist = []
+        Cx = np.vectorize(Solve.cx_time(calc, 1))
+        Ylist.append(Cx(X))
         for x in range(count):
-            Cx = np.vectorize(Solve.cx_time(calc, multiple * (1 + x)))
-            Ylist.append(Cx(X))
+            Cxm = np.vectorize(Solve.cx_time(calc, multiple * (1 + x)))
+            Cxd = np.vectorize(Solve.cx_time(calc, 1 / (multiple * (1 + x))))
+            Ylist.append(Cxm(X))
+            Ylist.append(Cxd(X))
 
         graph.multiplot(X, Ylist)
         graph.labels("Depth (cm)", "Concentration @ Depth (wt%C)", "Carburization")
@@ -279,7 +289,11 @@ def main():
     def update():
         update_variables()
         update_calc()
-        set_graph(4, 2)
+        # RE-SET_GRAPH()
+        if multiplot:
+            set_graph(3, 2) 
+        else:
+            set_graph()
         update_debug()
 
     ## --- menu callbacks ---
@@ -288,6 +302,14 @@ def main():
         savename = filedialog.asksaveasfilename(defaultextension=".png")
         if savename != "":
             graph.fig.savefig(savename, format="png")
+
+    ## Options -> Scaled time graphs
+    def scaled_graphs():
+        nonlocal multiplot
+        if multiplot:
+            multiplot = False
+        else:
+            multiplot = True
 
     ## placeholder command
     def do_nothing():
