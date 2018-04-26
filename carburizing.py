@@ -17,7 +17,7 @@ class Calculator:
     Q  = 32900     # cal / mol
 
     def __init__(self):
-        self.D0 = 0.23 * 60 # cm^2 / min #\\ changes with C0
+        self.D0 = 0.23 * 60   # cm^2 / min # changes with C0
         self.T = 950        # temperature (C)
         self.C0 = .18
         self.time = 60      # min
@@ -62,7 +62,7 @@ class Solve:
         return (Cs - Cx) / (Cs - C0)
     
     def x(z, D, time):
-        return 2 * erfinv(z) * sqrt(D * time)
+        return 10 * 2 * erfinv(z) * sqrt(D * time)
 
     def time(x, z, D):
         return pow(x / (2 * erfinv(z)), 2) / D
@@ -166,7 +166,7 @@ def main():
     canvas = Canvas(mainframe, width=640, height=320)
     fig_photo =  draw_figure(canvas, graph.fig)
 
-    multiplot = True
+    multiplot = BooleanVar()
 
     def init():
         root.title("Carburization Penetration Depth")
@@ -176,7 +176,7 @@ def main():
         filemenu.add_separator()
         filemenu.add_command(label="Quit", command=root.quit)
         menubar.add_cascade(label="Options", menu=optionsmenu)
-        optionsmenu.add_command(label="Scaled time graphs", command=scaled_graphs)
+        optionsmenu.add_checkbutton(label="Scaled time graphs", onvalue=True, offvalue=False, variable=multiplot)
         root.config(menu=menubar)
         
         tempt.set(calc.T)
@@ -208,7 +208,7 @@ def main():
         canvas.grid(column=4, row=1, columnspan=5, rowspan=5, sticky=N+W)
 
         # INTIAL SET_GRAPH()
-        if multiplot:
+        if multiplot.get():
             set_graph(3, 2) 
         else:
             set_graph()
@@ -290,11 +290,11 @@ def main():
         update_variables()
         update_calc()
         # RE-SET_GRAPH()
-        if multiplot:
+        if multiplot.get():
             set_graph(3, 2) 
         else:
             set_graph()
-        update_debug()
+        #update_debug()
 
     ## --- menu callbacks ---
     ## File -> Export Graph
@@ -302,14 +302,6 @@ def main():
         savename = filedialog.asksaveasfilename(defaultextension=".png")
         if savename != "":
             graph.fig.savefig(savename, format="png")
-
-    ## Options -> Scaled time graphs
-    def scaled_graphs():
-        nonlocal multiplot
-        if multiplot:
-            multiplot = False
-        else:
-            multiplot = True
 
     ## placeholder command
     def do_nothing():
