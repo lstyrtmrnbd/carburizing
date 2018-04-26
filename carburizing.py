@@ -205,7 +205,7 @@ def main():
         calculate.config(command=update)
         canvas.grid(column=4, row=1, columnspan=5, rowspan=5, sticky=N+W)
 
-        set_graph() # INTIAL SET_GRAPH()
+        set_graph(4, 2) # INTIAL SET_GRAPH()
 
         root.mainloop() # sticks in here and handles events
 
@@ -213,11 +213,9 @@ def main():
     def set_graph(count=1, multiple=1):
         nonlocal fig_photo
         X = np.arange(0, calc.x, 0.005)
-        #Cx = np.vectorize(calc.cx_solver())
-        #Y = Cx(X)
         Ylist = []
         for x in range(count):
-            Cx = np.vectorize(Solve.cx_time(calc, multiple))
+            Cx = np.vectorize(Solve.cx_time(calc, multiple * (1 + x)))
             Ylist.append(Cx(X))
 
         graph.multiplot(X, Ylist)
@@ -281,7 +279,7 @@ def main():
     def update():
         update_variables()
         update_calc()
-        set_graph()
+        set_graph(4, 2)
         update_debug()
 
     ## --- menu callbacks ---
