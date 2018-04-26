@@ -21,15 +21,14 @@ class Calculator:
         self.T = 950        # temperature (C)
         self.C0 = .18
         self.time = 60      # min
-        self.Cs = 1.3
         
         self.update()
         self.solve_x()
         
     def update(self):
-        #self.Cs = (self.T - 485) / 285 # perverts resultant x value
+        self.Cs = (self.T - 485) / 285
         self.D = self.D0 * exp( -Calculator.Q / (Calculator.R * (273 + self.T)))  
-        self.Cx = self.C0 + pow(10, -16)
+        self.Cx = self.C0 + pow(10, -15)
         self.z = (self.Cs - self.Cx) / (self.Cs - self.C0)
 
     def solve_x(self):
@@ -74,9 +73,9 @@ class Solve:
     def cx(Cs, C0, x, D0, time, temp):
         return lambda x: Cs - (Cs - C0) * erf(x / (2 * (D0 * (60 * time) * exp(-Q / (R * (temp + 273))))))
 
-    # return the same cx_solver as a Calculator but with time hooked
-    def cx_ct(calc, time):
-        return lambda x: Calculator.Cs - (Calculator.Cs - calc.C0) * erf(x / (2 * (calc.D0 * (60 * time) * exp(-Calculator.Q / (Calculator.R * (calc.T + 273))))))
+    # return the same cx_solver as a Calculator but with time scaled by s
+    def cx_time(calc, s):
+        return lambda x: calc.Cs - (calc.Cs - calc.C0) * erf(x / (2 * (calc.D0 * (60 * calc.time * s) * exp(-Calculator.Q / (Calculator.R * (calc.T + 273))))))
 
 ## maintains the plotting state and functionality
 class Graph:
@@ -98,14 +97,12 @@ class Graph:
         if title  != None: self.ax.set_title(title)
 
     def plot(self, X, Y):
-        self.X = X
-        self.Y = Y
         self.ax.clear()
-        self.ax.plot(self.X, self.Y)
+        self.ax.plot(X, Y)
 
-    def multiplot(self, X, *args):
+    def multiplot(self, X, Ylist):
         self.ax.clear()
-        for Y in args:
+        for Y in Ylist:
             self.ax.plot(X, Y)
 
 def draw_figure(canvas, figure, loc=(0, 0)):
@@ -208,7 +205,7 @@ def main():
         calculate.config(command=update)
         canvas.grid(column=4, row=1, columnspan=5, rowspan=5, sticky=N+W)
 
-        set_graph()
+        set_graph() # INTIAL SET_GRAPH()
 
         root.mainloop() # sticks in here and handles events
 
@@ -216,15 +213,16 @@ def main():
     def set_graph(count=1, multiple=1):
         nonlocal fig_photo
         X = np.arange(0, calc.x, 0.005)
-        Cx = np.vectorize(calc.cx_solver())
-        Y = Cx(X)
-      
-        graph.plot(X, Y)
+        #Cx = np.vectorize(calc.cx_solver())
+        #Y = Cx(X)
+        Ylist = []
+        for x in range(count):
+            Cx = np.vectorize(Solve.cx_time(calc, multiple))
+            Ylist.append(Cx(X))
+
+        graph.multiplot(X, Ylist)
         graph.labels("Depth (cm)", "Concentration @ Depth (wt%C)", "Carburization")
         fig_photo = draw_figure(canvas, graph.fig)
-        
-        debug_string = "X: " + str(X) + " Y: " + str(Y)
-        return debug_string
         
     ## steel type selection
     def selectC0(*args):
